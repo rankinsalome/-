@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>火柴人打架动画</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="fightCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("fightCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// 火柴人类
+class Stickman {
+  constructor(x, color, direction) {
+    this.x = x;
+    this.y = canvas.height - 100;
+    this.color = color;
+    this.dir = direction; // 1=右,-1=左
+    this.swingAngle = 0;
+    this.swingSpeed = 0.1 + Math.random() * 0.1;
+  }
+
+  draw() {
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 4;
+
+    // 身体
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y - 50); // 脖子
+    ctx.lineTo(this.x, this.y);      // 身体
+    ctx.stroke();
+
+    // 头
+    ctx.beginPath();
+    ctx.arc(this.x, this.y - 70, 15, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 手
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y - 40);
+    ctx.lineTo(this.x + 25 * this.dir, this.y - 30);
+    ctx.stroke();
+
+    // 剑(动)
+    const swordX = this.x + 25 * this.dir + 20 * Math.cos(this.swingAngle) * this.dir;
+    const swordY = this.y - 30 + 20 * Math.sin(this.swingAngle);
+    ctx.beginPath();
+    ctx.moveTo(this.x + 25 * this.dir, this.y - 30);
+    ctx.lineTo(swordX, swordY);
+    ctx.strokeStyle = "white";
+    ctx.stroke();
+
+    // 腿
+    ctx.strokeStyle = this.color;
+    ctx.beginPath();
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x - 10, this.y + 30);
+    ctx.moveTo(this.x, this.y);
+    ctx.lineTo(this.x + 10, this.y + 30);
+    ctx.stroke();
+  }
+
+  update() {
+    this.swingAngle += this.swingSpeed;
+    this.draw();
+  }
+}
+
+// 初始化两个火柴人
+const fighter1 = new Stickman(200, "#00ff00", 1);
+const fighter2 = new Stickman(canvas.width - 200, "#ff3366", -1);
+
+function animate() {
+  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  fighter1.update();
+  fighter2.update();
+
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>
